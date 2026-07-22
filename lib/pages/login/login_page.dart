@@ -1,26 +1,45 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:hz_xg_pad/app_routes.dart';
+import 'package:hz_xg_pad/util/feedback_util.dart';
+import 'package:jwt_decoder/jwt_decoder.dart';
 
-import 'home_page.dart';
+import '../../entity/login_user.dart';
+import '../../http/UserApi.dart';
+import '../../provider/TokenProvider.dart';
+import '../home/home_page.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
 
-  static const routeName = '/login';
 
   @override
   State<LoginPage> createState() => _LoginPageState();
 }
 
 class _LoginPageState extends State<LoginPage> {
-  late final TextEditingController _usernameController;
-  late final TextEditingController _passwordController;
+   final TextEditingController _usernameController = TextEditingController();
+   final TextEditingController _passwordController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    _usernameController = TextEditingController(text: 'admin');
-    _passwordController = TextEditingController(text: '123456');
+    _restoreLoginUser();
   }
+
+  Future<void> _restoreLoginUser() async {
+    final loginUser = await TokenProvider.getLoginUser();
+
+    print(loginUser);
+    print("---------------");
+    if (!mounted || loginUser == null) {
+      return;
+    }
+
+   /* _usernameController.text = loginUser.username;
+    _passwordController.text = loginUser.pwd;*/
+  }
+
 
   @override
   void dispose() {
@@ -28,6 +47,46 @@ class _LoginPageState extends State<LoginPage> {
     _passwordController.dispose();
     super.dispose();
   }
+
+  Future<void> _submit() async {
+    final username = _usernameController.text.trim();
+    final password = _passwordController.text;
+
+    if (username.isEmpty || password.isEmpty) {
+     /* ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('请输入用户名和密码')),
+      );*/
+      FeedbackUtil.showError("请输入用户名和密码");
+      return;
+    }
+
+    FocusScope.of(context).unfocus();
+
+    var token =  await UserApi.login({
+      "username" : username,
+      "pwd" : password,
+    });
+
+    Map<String, dynamic> decodedToken = JwtDecoder.decode(token);
+
+    var user = LoginUser(
+      username: username,
+      pwd: password,
+      rememberMe: true,
+      realName: decodedToken['realName'],
+      token: token,
+    );
+    await TokenProvider.saveLoginUser(user);
+
+    if (!mounted) {
+      return;
+    }
+    EasyLoading.showSuccess("登录成功");
+
+    Navigator.pushReplacementNamed(context, AppRoutes.home);
+
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -159,12 +218,7 @@ class _LoginPageState extends State<LoginPage> {
                               width: double.infinity,
                               height: buttonHeight,
                               child: ElevatedButton(
-                                onPressed: () {
-                                  Navigator.pushReplacementNamed(
-                                    context,
-                                    HomePage.routeName,
-                                  );
-                                },
+                                onPressed: _submit,
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: const Color(0xFF3D63F0),
                                   foregroundColor: Colors.white,

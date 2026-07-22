@@ -1,14 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:hive/hive.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
-import 'pages/home_page.dart';
-import 'pages/login_page.dart';
+import 'app_routes.dart';
+import 'entity/login_user.dart';
+import 'entity/production_order.dart';
+import 'pages/home/home_page.dart';
+import 'pages/login/login_page.dart';
 
-void main() {
+void main() async{
   WidgetsFlutterBinding.ensureInitialized();
 
   // 隐藏系统状态栏
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+
+  await Hive.initFlutter();
+  Hive.registerAdapter(LoginUserAdapter());
+  Hive.registerAdapter(ProductionOrderAdapter());
 
   runApp(const MyApp());
 }
@@ -26,11 +36,12 @@ class MyApp extends StatelessWidget {
         scaffoldBackgroundColor: Colors.white,
         useMaterial3: true,
       ),
-      initialRoute: LoginPage.routeName,
+      initialRoute: AppRoutes.login,
       routes: {
-        LoginPage.routeName: (context) => const LoginPage(),
-        HomePage.routeName: (context) => const HomePage(),
+        AppRoutes.login: (context) => const LoginPage(),
+        AppRoutes.home: (context) => const HomePage(),
       },
+      builder: EasyLoading.init(),
     );
   }
 }
