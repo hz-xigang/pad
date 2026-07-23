@@ -36,14 +36,44 @@ class _WeightSectionState extends State<WeightSection> {
     _netWeightController.addListener(() {
       widget.state.setNetWeight(_netWeightController.text);
     });
+
+    // 监听 state 变化，同步更新输入框
+    widget.state.addListener(_syncControllers);
   }
 
   @override
   void dispose() {
+    widget.state.removeListener(_syncControllers);
     _quantityController.dispose();
     _grossWeightController.dispose();
     _netWeightController.dispose();
     super.dispose();
+  }
+
+  void _syncControllers() {
+    // 同步单箱数量
+    if (_quantityController.text != widget.state.quantity) {
+      _quantityController.value = TextEditingValue(
+        text: widget.state.quantity,
+        selection: TextSelection.collapsed(offset: widget.state.quantity.length),
+      );
+    }
+
+    // 同步毛重
+    if (_grossWeightController.text != widget.state.grossWeight) {
+      _grossWeightController.value = TextEditingValue(
+        text: widget.state.grossWeight,
+        selection: TextSelection.collapsed(offset: widget.state.grossWeight.length),
+      );
+    }
+
+    // 同步净重
+    if (_netWeightController.text != widget.state.netWeight) {
+      _netWeightController.value = TextEditingValue(
+        text: widget.state.netWeight,
+        selection: TextSelection.collapsed(offset: widget.state.netWeight.length),
+      );
+    }
   }
 
   @override

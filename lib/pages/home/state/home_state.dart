@@ -14,11 +14,19 @@ class HomeState extends ChangeNotifier {
   String _grossWeight = '';
   String _netWeight = '';
 
+  // 焦点恢复回调（在清空表单后调用）
+  VoidCallback? _onNeedFocusCallback;
+
   ProductionOrder? get productionOrder => _productionOrder;
   String get productionNo => _productionNo;
   String get quantity => _quantity;
   String get grossWeight => _grossWeight;
   String get netWeight => _netWeight;
+
+  // 设置焦点恢复回调
+  void setOnNeedFocusCallback(VoidCallback callback) {
+    _onNeedFocusCallback = callback;
+  }
 
   void setProductionNo(String value) {
     _productionNo = value;
@@ -45,8 +53,17 @@ class HomeState extends ChangeNotifier {
     if (_productionNo.isEmpty) {
       return;
     }
-     _productionOrder = await ProdApi.findByPgNo(_productionNo);
-    notifyListeners();
+
+    try {
+      _productionOrder = await ProdApi.findByPgNo(_productionNo);
+      notifyListeners();
+      // 查询完成后恢复焦点
+      _onNeedFocusCallback?.call();
+    } catch (e) {
+      FeedbackUtil.showError('查询失败：${e.toString()}');
+      _productionOrder = null;
+      notifyListeners();
+    }
   }
 
   // 清空表单
@@ -57,6 +74,8 @@ class HomeState extends ChangeNotifier {
     _netWeight = '';
     _productionOrder = null;
     notifyListeners();
+    // 清空后恢复焦点
+    _onNeedFocusCallback?.call();
   }
 
   // 验证表单
@@ -67,25 +86,36 @@ class HomeState extends ChangeNotifier {
         _netWeight.isNotEmpty;
   }
 
+  // 验证输入数值的有效性
   bool inputValid() {
-    if (_isPositiveInt(_quantity)) {
-      FeedbackUtil.showError("数量不能为0");
+    if (_quantity.isEmpty || _grossWeight.isEmpty || _netWeight.isEmpty) {
       return false;
     }
-    if (_isPositiveInt(_grossWeight)) {
-      FeedbackUtil.showError("毛重不能为0");
+
+    final quantity = int.tryParse(_quantity.trim());
+    final grossWeight = double.tryParse(_grossWeight.trim());
+    final netWeight = double.tryParse(_netWeight.trim());
+
+    if (quantity == null || quantity <= 0) {
+      FeedbackUtil.showError("单箱数量必须是大于0的整数");
       return false;
     }
-    if (_isPositiveInt(_netWeight)) {
-      FeedbackUtil.showError("净重不能为0");
+
+    if (grossWeight == null || grossWeight <= 0) {
+      FeedbackUtil.showError("毛重必须是大于0的数字");
       return false;
     }
+
+    if (netWeight == null || netWeight <= 0) {
+      FeedbackUtil.showError("净重必须是大于0的数字");
+      return false;
+    }
+
+    if (netWeight >= grossWeight) {
+      FeedbackUtil.showError("净重必须小于毛重");
+      return false;
+    }
+
     return true;
   }
-
-  bool _isPositiveInt(String value) {
-    final int? parsed = int.tryParse(value.trim());
-    return parsed != null && parsed > 0;
-  }
-
 }

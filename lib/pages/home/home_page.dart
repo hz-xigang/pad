@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'dart:async';
 
 import 'components/custom_app_bar.dart';
 import 'layouts/action_buttons.dart';
@@ -24,16 +25,21 @@ class _HomePageState extends State<HomePage> {
 
   // 扫描枪输入缓冲区
   String _scanBuffer = '';
+  Timer? _scanTimer;
 
   @override
   void initState() {
     super.initState();
     _state = HomeState();
     _state.addListener(_onStateChanged);
+
+    // 设置焦点恢复回调（只在关键时机触发）
+    _state.setOnNeedFocusCallback(_restoreFocus);
   }
 
   @override
   void dispose() {
+    _scanTimer?.cancel();
     _state.removeListener(_onStateChanged);
     _state.dispose();
     _keyboardFocusNode.dispose();
@@ -44,8 +50,29 @@ class _HomePageState extends State<HomePage> {
     setState(() {});
   }
 
+  void _restoreFocus() {
+    // 延迟恢复焦点，确保其他操作完成
+    Future.delayed(const Duration(milliseconds: 100), () {
+      if (mounted && !_keyboardFocusNode.hasFocus) {
+        _keyboardFocusNode.requestFocus();
+      }
+    });
+  }
+
   void _handleKeyEvent(KeyEvent event) {
     if (event is! KeyDownEvent) return;
+
+    // 检查是否有输入框获得焦点（排除 _keyboardFocusNode）
+    final currentFocus = FocusScope.of(context).focusedChild;
+    final isInputFieldFocused = currentFocus != null &&
+                                 currentFocus != _keyboardFocusNode &&
+                                 currentFocus.context?.widget is Focus;
+
+    // 如果有输入框获得焦点，清空缓冲区并忽略按键
+    if (isInputFieldFocused) {
+      _scanBuffer = '';
+      return;
+    }
 
     // 回车键：完成扫描，执行查询
     if (event.logicalKey == LogicalKeyboardKey.enter) {
@@ -63,6 +90,12 @@ class _HomePageState extends State<HomePage> {
     final char = event.character;
     if (char != null && char.isNotEmpty) {
       _scanBuffer += char;
+
+      // 设置超时清空缓冲区（扫描枪通常在 100ms 内完成，设置 500ms 超时）
+      _scanTimer?.cancel();
+      _scanTimer = Timer(const Duration(milliseconds: 500), () {
+        _scanBuffer = '';
+      });
     }
   }
 
@@ -108,7 +141,7 @@ class _HomePageState extends State<HomePage> {
                     const FormHeader(),
                     const SizedBox(height: 20),
                     // 标签信息区域（生产单信息）
-                    InfoSection(state: _state),
+                    InfoSection(state: _state, keyboardFocusNode: _keyboardFocusNode),
                     const SizedBox(height: 16),
                     // 重量信息区域
                     WeightSection(state: _state),

@@ -8,9 +8,11 @@ class InfoSection extends StatefulWidget {
   const InfoSection({
     super.key,
     required this.state,
+    required this.keyboardFocusNode,
   });
 
   final HomeState state;
+  final FocusNode keyboardFocusNode;
 
   @override
   State<InfoSection> createState() => _InfoSectionState();
@@ -60,10 +62,22 @@ class _InfoSectionState extends State<InfoSection> {
                 required: true,
                 controller: _productionNoController,
                 placeholder: '请输入生产单号,回车查询...',
-                onSubmitted: (_) => widget.state.searchProductionOrder(),
+                onSubmitted: (_) {
+                  widget.state.searchProductionOrder();
+                  // 查询完成后，重新获取焦点以便扫描枪继续输入
+                  Future.delayed(const Duration(milliseconds: 100), () {
+                    widget.keyboardFocusNode.requestFocus();
+                  });
+                },
                 suffixIcon: IconButton(
                   icon: const Icon(Icons.search, color: Color(0xFF3D63F0)),
-                  onPressed: widget.state.searchProductionOrder,
+                  onPressed: () {
+                    widget.state.searchProductionOrder();
+                    // 点击搜索后也重新获取焦点
+                    Future.delayed(const Duration(milliseconds: 100), () {
+                      widget.keyboardFocusNode.requestFocus();
+                    });
+                  },
                 ),
               ),
             ),

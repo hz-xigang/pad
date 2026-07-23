@@ -10,39 +10,45 @@ class ActionButtons extends StatelessWidget {
 
   final HomeState state;
 
-  void _handlePrint(BuildContext context)  async{
-    if( state.productionOrder == null){
+  void _handlePrint(BuildContext context) async {
+    // 验证生产订单
+    if (state.productionOrder == null) {
       FeedbackUtil.showError('未扫描生产订单号');
       return;
     }
 
-   if(! state.inputValid()){
-     return;
-   }
+    // 验证输入有效性
+    if (!state.inputValid()) {
+      return;
+    }
 
+    // 确认提交
     final bool confirmed = await DialogUtil.showConfirmDialog(
       context,
       content: '确认提交打印吗？',
       confirmText: '确认',
     );
 
-   print("confirmed== $confirmed");
-
-    if (confirmed) {
+    if (!confirmed) {
       return;
     }
 
+    // 提交数据
     final Map<String, dynamic> res = {
-      'prodOrderId': state.productionOrder?.id,
+      'prodOrderId': state.productionOrder!.id,
       'grossWeight': double.parse(state.grossWeight.trim()),
       'netWeight': double.parse(state.netWeight.trim()),
       'qty': int.parse(state.quantity.trim()),
     };
 
-    FeedbackUtil.showLoading('上传中...');
-    await ProdTagApi.add(res);
-    FeedbackUtil.showSuccess('上传成功');
-    state.clearForm();
+    try {
+      FeedbackUtil.showLoading('上传中...');
+      await ProdTagApi.add(res);
+      FeedbackUtil.showSuccess('上传成功');
+      state.clearForm();
+    } catch (e) {
+      FeedbackUtil.showError('上传失败：${e.toString()}');
+    }
   }
 
   void _handleShowList(BuildContext context) {
