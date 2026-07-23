@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:hz_xg_pad/app_routes.dart';
 import 'package:hz_xg_pad/util/feedback_util.dart';
@@ -57,6 +58,8 @@ class _LoginPageState extends State<LoginPage> {
     }
 
     FocusScope.of(context).unfocus();
+    // 重新隐藏状态栏
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
 
     var token =  await UserApi.login({
       "username" : username,

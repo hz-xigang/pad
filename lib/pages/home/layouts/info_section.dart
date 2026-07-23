@@ -26,12 +26,25 @@ class _InfoSectionState extends State<InfoSection> {
     _productionNoController.addListener(() {
       widget.state.setProductionNo(_productionNoController.text);
     });
+    // 监听 state 变化，同步更新输入框
+    widget.state.addListener(_syncController);
   }
 
   @override
   void dispose() {
+    widget.state.removeListener(_syncController);
     _productionNoController.dispose();
     super.dispose();
+  }
+
+  void _syncController() {
+    // 如果 state 的值与 controller 不同，更新 controller（避免循环）
+    if (_productionNoController.text != widget.state.productionNo) {
+      _productionNoController.value = TextEditingValue(
+        text: widget.state.productionNo,
+        selection: TextSelection.collapsed(offset: widget.state.productionNo.length),
+      );
+    }
   }
 
   @override

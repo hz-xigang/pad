@@ -1,4 +1,6 @@
 import 'package:flutter/foundation.dart';
+import 'package:hz_xg_pad/http/ProdApi.dart';
+import 'package:hz_xg_pad/util/feedback_util.dart';
 
 import '../../../entity/production_order.dart';
 
@@ -43,21 +45,7 @@ class HomeState extends ChangeNotifier {
     if (_productionNo.isEmpty) {
       return;
     }
-
-
-
-    // TODO: 调用后端API根据生产单号查询
-    // 模拟查询后自动填充数据
-    _productionOrder = const ProductionOrder(
-      erpOrderNo: 'UF202401001',
-      customerCode: 'CUST001',
-      inventoryCode: 'INV001',
-      inventoryName: '产品名称示例',
-      custMaterialNo: 'CUST-MAT-001',
-      spec: '100x200x5mm',
-      material: '不锈钢304',
-      productCategory: '标准件',
-    );
+     _productionOrder = await ProdApi.findByPgNo(_productionNo);
     notifyListeners();
   }
 
@@ -78,4 +66,26 @@ class HomeState extends ChangeNotifier {
         _grossWeight.isNotEmpty &&
         _netWeight.isNotEmpty;
   }
+
+  bool inputValid() {
+    if (_isPositiveInt(_quantity)) {
+      FeedbackUtil.showError("数量不能为0");
+      return false;
+    }
+    if (_isPositiveInt(_grossWeight)) {
+      FeedbackUtil.showError("毛重不能为0");
+      return false;
+    }
+    if (_isPositiveInt(_netWeight)) {
+      FeedbackUtil.showError("净重不能为0");
+      return false;
+    }
+    return true;
+  }
+
+  bool _isPositiveInt(String value) {
+    final int? parsed = int.tryParse(value.trim());
+    return parsed != null && parsed > 0;
+  }
+
 }

@@ -9,6 +9,7 @@ class LabelInputField extends StatelessWidget {
     this.placeholder,
     this.suffixIcon,
     this.onSubmitted,
+    this.keyboardType,
   });
 
   final String label;
@@ -17,6 +18,7 @@ class LabelInputField extends StatelessWidget {
   final String? placeholder;
   final Widget? suffixIcon;
   final ValueChanged<String>? onSubmitted;
+  final TextInputType? keyboardType;
 
   @override
   Widget build(BuildContext context) {
@@ -49,6 +51,7 @@ class LabelInputField extends StatelessWidget {
         TextFormField(
           controller: controller,
           onFieldSubmitted: onSubmitted,
+          keyboardType: keyboardType,
           decoration: InputDecoration(
             hintText: placeholder,
             hintStyle: TextStyle(

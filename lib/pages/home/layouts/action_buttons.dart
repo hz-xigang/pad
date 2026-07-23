@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 
+import '../../../http/ProdTagApi.dart';
+import '../../../util/dialog_util.dart';
+import '../../../util/feedback_util.dart';
 import '../state/home_state.dart';
 
 class ActionButtons extends StatelessWidget {
@@ -7,17 +10,39 @@ class ActionButtons extends StatelessWidget {
 
   final HomeState state;
 
-  void _handlePrint(BuildContext context) {
-    if (state.validate()) {
-      // TODO: 调用打印接口
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('开始打印标签')),
-      );
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('请填写完整的表单信息')),
-      );
+  void _handlePrint(BuildContext context)  async{
+    if( state.productionOrder == null){
+      FeedbackUtil.showError('未扫描生产订单号');
+      return;
     }
+
+   if(! state.inputValid()){
+     return;
+   }
+
+    final bool confirmed = await DialogUtil.showConfirmDialog(
+      context,
+      content: '确认提交打印吗？',
+      confirmText: '确认',
+    );
+
+   print("confirmed== $confirmed");
+
+    if (confirmed) {
+      return;
+    }
+
+    final Map<String, dynamic> res = {
+      'prodOrderId': state.productionOrder?.id,
+      'grossWeight': double.parse(state.grossWeight.trim()),
+      'netWeight': double.parse(state.netWeight.trim()),
+      'qty': int.parse(state.quantity.trim()),
+    };
+
+    FeedbackUtil.showLoading('上传中...');
+    await ProdTagApi.add(res);
+    FeedbackUtil.showSuccess('上传成功');
+    state.clearForm();
   }
 
   void _handleShowList(BuildContext context) {

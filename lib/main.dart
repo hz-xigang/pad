@@ -13,8 +13,14 @@ import 'pages/login/login_page.dart';
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
 
-  // 隐藏系统状态栏
+  // 隐藏系统状态栏，并在状态栏被系统唤起时自动重新隐藏
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+  SystemChrome.setSystemUIChangeCallback((systemOverlaysAreVisible) async {
+    if (systemOverlaysAreVisible) {
+      await Future.delayed(const Duration(milliseconds: 300));
+      SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+    }
+  });
 
   await Hive.initFlutter();
   Hive.registerAdapter(LoginUserAdapter());
