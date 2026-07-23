@@ -29,15 +29,12 @@ class _LoginPageState extends State<LoginPage> {
 
   Future<void> _restoreLoginUser() async {
     final loginUser = await TokenProvider.getLoginUser();
-
-    print(loginUser);
-    print("---------------");
     if (!mounted || loginUser == null) {
       return;
     }
 
-   /* _usernameController.text = loginUser.username;
-    _passwordController.text = loginUser.pwd;*/
+    _usernameController.text = loginUser.username;
+    _passwordController.text = loginUser.pwd;
   }
 
 

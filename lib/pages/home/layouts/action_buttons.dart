@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-class LabelActionButtons extends StatelessWidget {
-  const LabelActionButtons({
+class ActionButtons extends StatelessWidget {
+  const ActionButtons({
     super.key,
     required this.onPrint,
     required this.onShowList,
