@@ -89,7 +89,6 @@ class _LoginPageState extends State<LoginPage> {
     final theme = Theme.of(context);
 
     return Scaffold(
-      resizeToAvoidBottomInset: false,
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
@@ -121,6 +120,7 @@ class _LoginPageState extends State<LoginPage> {
               final cardWidth = constraints.maxWidth < 600
                   ? constraints.maxWidth - (outerHorizontal * 2)
                   : 420.0;
+              final keyboardInset = MediaQuery.viewInsetsOf(context).bottom;
 
               return Padding(
                 padding: EdgeInsets.symmetric(
@@ -128,6 +128,9 @@ class _LoginPageState extends State<LoginPage> {
                   vertical: outerVertical,
                 ),
                 child: SingleChildScrollView(
+                  keyboardDismissBehavior:
+                      ScrollViewKeyboardDismissBehavior.manual,
+                  padding: EdgeInsets.only(bottom: keyboardInset),
                   child: ConstrainedBox(
                     constraints: BoxConstraints(
                       minHeight: constraints.maxHeight - (outerVertical * 2),
