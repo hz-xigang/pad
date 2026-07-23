@@ -7,6 +7,7 @@ import 'package:jwt_decoder/jwt_decoder.dart';
 import '../../entity/login_user.dart';
 import '../../http/UserApi.dart';
 import '../../provider/TokenProvider.dart';
+import '../home/home_page.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -89,7 +90,6 @@ class _LoginPageState extends State<LoginPage> {
     final theme = Theme.of(context);
 
     return Scaffold(
-      resizeToAvoidBottomInset: false,
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
@@ -127,15 +127,12 @@ class _LoginPageState extends State<LoginPage> {
                   horizontal: outerHorizontal,
                   vertical: outerVertical,
                 ),
-                child: SingleChildScrollView(
-                  child: ConstrainedBox(
-                    constraints: BoxConstraints(
-                      minHeight: constraints.maxHeight - (outerVertical * 2),
-                    ),
-                    child: Center(
-                      child: SizedBox(
-                        width: cardWidth,
-                        child: Container(
+                child: Center(
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: SizedBox(
+                      width: cardWidth,
+                      child: Container(
                         padding: EdgeInsets.fromLTRB(
                           cardHorizontal,
                           cardTop,
@@ -236,7 +233,6 @@ class _LoginPageState extends State<LoginPage> {
                             ),
                           ],
                         ),
-                      ),
                       ),
                     ),
                   ),
