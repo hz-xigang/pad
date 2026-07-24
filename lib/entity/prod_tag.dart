@@ -19,6 +19,7 @@ class ProdTag {
     this.inventoryName,
     this.username,
     this.userId,
+    this.deleted,
   });
 
   final String? id;
@@ -36,6 +37,7 @@ class ProdTag {
   final String? inventoryName;
   final String? username;
   final String? userId;
+  final int? deleted;
 
   factory ProdTag.fromJson(Map<String, dynamic> json) {
     return ProdTag(
@@ -54,6 +56,7 @@ class ProdTag {
       inventoryName: _asString(json['inventoryName']),
       username: _asString(json['username']),
       userId: _asString(json['userId']),
+      deleted: _asInt(json['deleted']),
     );
   }
 
@@ -93,6 +96,7 @@ class ProdTag {
       'inventoryName': inventoryName,
       'username': username,
       'userId': userId,
+      'deleted': deleted,
     };
   }
 
@@ -159,13 +163,14 @@ class ProdTagAdapter extends TypeAdapter<ProdTag> {
       inventoryName: fields[12] as String?,
       username: fields[13] as String?,
       userId: fields[14] as String?,
+      deleted: fields[15] as int?,
     );
   }
 
   @override
   void write(BinaryWriter writer, ProdTag obj) {
     writer
-      ..writeByte(15)
+      ..writeByte(16)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -195,6 +200,8 @@ class ProdTagAdapter extends TypeAdapter<ProdTag> {
       ..writeByte(13)
       ..write(obj.username)
       ..writeByte(14)
-      ..write(obj.userId);
+      ..write(obj.userId)
+      ..writeByte(15)
+      ..write(obj.deleted);
   }
 }

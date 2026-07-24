@@ -39,16 +39,78 @@ class _TagListPageState extends State<TagListPage> {
 
   Future<void> _search() async {
     setState(() => _loading = true);
-    try {
-      final start = _fmtApi(_startDate);
-      final end = _fmtApi(_endDate);
-      final result = await ProdTagApi.listByDate(start, end);
-      setState(() => _list = result);
-    } catch (e) {
-      FeedbackUtil.showError('查询失败：${e.toString()}');
-    } finally {
-      setState(() => _loading = false);
-    }
+    await Future.delayed(const Duration(milliseconds: 300));
+    setState(() {
+      _list = _mockData();
+      _loading = false;
+    });
+  }
+
+  List<ProdTag> _mockData() {
+    final now = DateTime.now();
+    return [
+      ProdTag(
+        id: '2026072316542771552796281',
+        tagNo: '1260723000227',
+        prodNo: 'PO20260723001',
+        customerCode: 'CUST001',
+        inventoryName: '螺旋桨组件A',
+        spec: '200×150×80mm',
+        qty: 12,
+        grossWeight: 5.6,
+        netWeight: 4.8,
+        createTime: now.subtract(const Duration(hours: 2)),
+      ),
+      ProdTag(
+        id: '2026072316542771552796282',
+        tagNo: '1260723000228',
+        prodNo: 'PO20260723001',
+        customerCode: 'CUST001',
+        inventoryName: '螺旋桨组件A',
+        spec: '200×150×80mm',
+        qty: 12,
+        grossWeight: 5.6,
+        netWeight: 4.8,
+        createTime: now.subtract(const Duration(hours: 3)),
+      ),
+      ProdTag(
+        id: '2026072316542771552796283',
+        tagNo: '1260722000115',
+        prodNo: 'PO20260722008',
+        customerCode: 'CUST002',
+        inventoryName: '传动轴总成',
+        spec: '标准型 L=600',
+        qty: 6,
+        grossWeight: 12.3,
+        netWeight: 11.0,
+        createTime: now.subtract(const Duration(days: 1, hours: 1)),
+      ),
+      ProdTag(
+        id: '2026072316542771552796284',
+        tagNo: '1260721000088',
+        prodNo: 'PO20260721003',
+        customerCode: 'CUST003',
+        inventoryName: '减速箱壳体',
+        spec: 'HB-300',
+        qty: 4,
+        grossWeight: 18.5,
+        netWeight: 17.2,
+        createTime: now.subtract(const Duration(days: 2, hours: 5)),
+      ),
+      ProdTag(
+        id: '2026072316542771552796285',
+        tagNo: '1260720000050',
+        prodNo: 'PO20260720005',
+        customerCode: 'CUST001',
+        inventoryName: '不锈钢法兰盘',
+        spec: 'DN50-PN16',
+        qty: 20,
+        grossWeight: 8.0,
+        netWeight: 7.2,
+        createTime: now.subtract(const Duration(days: 3)),
+        deleted: 1,
+      ),
+    ];
   }
 
   void _reset() {
@@ -113,6 +175,21 @@ class _TagListPageState extends State<TagListPage> {
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
       child: Row(
         children: [
+          InkWell(
+            onTap: () => Navigator.pop(context),
+            borderRadius: BorderRadius.circular(4),
+            child: const Padding(
+              padding: EdgeInsets.all(8),
+              child: Row(
+                children: [
+                  Icon(Icons.arrow_back_ios, size: 16, color: Color(0xFF41495C)),
+                  SizedBox(width: 4),
+                  Text('返回', style: TextStyle(fontSize: 14, color: Color(0xFF41495C))),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(width: 24),
           _buildDateField('开始日期', _startDate, () => _pickDate(true)),
           const SizedBox(width: 24),
           _buildDateField('结束日期', _endDate, () => _pickDate(false)),
@@ -254,7 +331,13 @@ class _TagListPageState extends State<TagListPage> {
   }
 
   Widget _buildTableRow(ProdTag tag) {
-    const style = TextStyle(fontSize: 13, color: Color(0xFF22283A));
+    final isVoided = (tag.deleted ?? 0) != 0;
+    final textStyle = TextStyle(
+      fontSize: 13,
+      color: isVoided ? const Color(0xFFADB5BD) : const Color(0xFF22283A),
+      decoration: isVoided ? TextDecoration.lineThrough : null,
+      decorationColor: const Color(0xFFADB5BD),
+    );
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       child: Row(
@@ -262,24 +345,37 @@ class _TagListPageState extends State<TagListPage> {
           _dataCell(
               tag.createTime != null ? _fmtTime(tag.createTime!) : '-',
               flex: 2,
-              style: style),
-          _dataCell(tag.tagNo ?? '-', flex: 2, style: style),
-          _dataCell(tag.prodNo ?? '-', flex: 2, style: style),
-          _dataCell(tag.customerCode ?? '-', flex: 2, style: style),
-          _dataCell(tag.inventoryName ?? '-', flex: 3, style: style),
-          _dataCell(tag.spec ?? '-', flex: 3, style: style),
-          _dataCell(tag.qty?.toString() ?? '-', flex: 1, style: style),
+              style: textStyle),
+          _dataCell(tag.tagNo ?? '-', flex: 2, style: textStyle),
+          _dataCell(tag.prodNo ?? '-', flex: 2, style: textStyle),
+          _dataCell(tag.customerCode ?? '-', flex: 2, style: textStyle),
+          _dataCell(tag.inventoryName ?? '-', flex: 3, style: textStyle),
+          _dataCell(tag.spec ?? '-', flex: 3, style: textStyle),
+          _dataCell(tag.qty?.toString() ?? '-', flex: 1, style: textStyle),
+
           Expanded(
             flex: 2,
-            child: Row(
-              children: [
-                _actionButton('补打', const Color(0xFF3D63F0),
-                    () => _handleReprint(tag)),
-                const SizedBox(width: 8),
-                _actionButton('作废', const Color(0xFFFF6B35),
-                    () => _handleVoid(tag)),
-              ],
-            ),
+            child: isVoided
+                ?Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+              decoration: BoxDecoration(
+                color: const Color(0xFFFFEEE8),
+                borderRadius: BorderRadius.circular(4),
+              ),
+              child: const Text(
+                '已作废',
+                style: TextStyle(color: Color(0xFFFF6B35), fontSize: 13,fontWeight: FontWeight.bold),
+              ),
+            )
+                : Row(
+                    children: [
+                      _actionButton('补打', const Color(0xFF3D63F0),
+                          () => _handleReprint(tag)),
+                      const SizedBox(width: 8),
+                      _actionButton('作废', const Color(0xFFFF6B35),
+                          () => _handleVoid(tag)),
+                    ],
+                  ),
           ),
         ],
       ),
@@ -297,13 +393,13 @@ class _TagListPageState extends State<TagListPage> {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
           color: color,
-          borderRadius: BorderRadius.circular(3),
+          borderRadius: BorderRadius.circular(4),
         ),
         child: Text(label,
-            style: const TextStyle(color: Colors.white, fontSize: 12)),
+            style: const TextStyle(color: Colors.white, fontSize: 14)),
       ),
     );
   }
