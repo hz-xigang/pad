@@ -52,10 +52,7 @@ class ActionButtons extends StatelessWidget {
   }
 
   void _handleShowList(BuildContext context) {
-    // TODO: 跳转到标签列表页面
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('查看标签列表')),
-    );
+    Navigator.pushNamed(context, '/tagList');
   }
 
   @override

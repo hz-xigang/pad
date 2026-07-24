@@ -9,6 +9,7 @@ import 'entity/login_user.dart';
 import 'entity/production_order.dart';
 import 'pages/home/home_page.dart';
 import 'pages/login/login_page.dart';
+import 'pages/tag_list/tag_list_page.dart';
 
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
@@ -46,6 +47,7 @@ class MyApp extends StatelessWidget {
       routes: {
         AppRoutes.login: (context) => const LoginPage(),
         AppRoutes.home: (context) => const HomePage(),
+        AppRoutes.tagList: (context) => const TagListPage(),
       },
       builder: EasyLoading.init(),
     );

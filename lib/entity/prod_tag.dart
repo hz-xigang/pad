@@ -9,7 +9,6 @@ class ProdTag {
     this.prodOrderId,
     this.grossWeight,
     this.netWeight,
-    this.printUser,
     this.productCategory,
     this.qty,
     this.prodNo,
@@ -17,8 +16,9 @@ class ProdTag {
     this.spec,
     this.customerCode,
     this.inventoryCode,
-    this.locId,
-    this.locCode,
+    this.inventoryName,
+    this.username,
+    this.userId,
   });
 
   final String? id;
@@ -26,16 +26,16 @@ class ProdTag {
   final String? prodOrderId;
   final double? grossWeight;
   final double? netWeight;
-  final String? printUser;
   final String? productCategory;
-  final double? qty;
+  final int? qty;
   final String? prodNo;
   final DateTime? createTime;
   final String? spec;
   final String? customerCode;
   final String? inventoryCode;
-  final String? locId;
-  final String? locCode;
+  final String? inventoryName;
+  final String? username;
+  final String? userId;
 
   factory ProdTag.fromJson(Map<String, dynamic> json) {
     return ProdTag(
@@ -44,16 +44,16 @@ class ProdTag {
       prodOrderId: _asString(json['prodOrderId']),
       grossWeight: _asDouble(json['grossWeight']),
       netWeight: _asDouble(json['netWeight']),
-      printUser: _asString(json['printUser']),
       productCategory: _asString(json['productCategory']),
-      qty: _asDouble(json['qty']),
+      qty: _asInt(json['qty']),
       prodNo: _asString(json['prodNo']),
       createTime: _asDateTime(json['createTime']),
       spec: _asString(json['spec']),
       customerCode: _asString(json['customerCode']),
       inventoryCode: _asString(json['inventoryCode']),
-      locId: _asString(json['locId']),
-      locCode: _asString(json['locCode']),
+      inventoryName: _asString(json['inventoryName']),
+      username: _asString(json['username']),
+      userId: _asString(json['userId']),
     );
   }
 
@@ -71,7 +71,6 @@ class ProdTag {
     if (value is! List) {
       throw const FormatException('JSON value is not a list.');
     }
-
     return value
         .map((item) => ProdTag.fromJson(_asJsonMap(item)))
         .toList(growable: false);
@@ -84,7 +83,6 @@ class ProdTag {
       'prodOrderId': prodOrderId,
       'grossWeight': grossWeight,
       'netWeight': netWeight,
-      'printUser': printUser,
       'productCategory': productCategory,
       'qty': qty,
       'prodNo': prodNo,
@@ -92,8 +90,9 @@ class ProdTag {
       'spec': spec,
       'customerCode': customerCode,
       'inventoryCode': inventoryCode,
-      'locId': locId,
-      'locCode': locCode,
+      'inventoryName': inventoryName,
+      'username': username,
+      'userId': userId,
     };
   }
 
@@ -108,32 +107,27 @@ class ProdTag {
   }
 
   static String? _asString(dynamic value) {
-    if (value == null) {
-      return null;
-    }
+    if (value == null) return null;
     return value.toString();
   }
 
   static double? _asDouble(dynamic value) {
-    if (value == null) {
-      return null;
-    }
-    if (value is double) {
-      return value;
-    }
-    if (value is num) {
-      return value.toDouble();
-    }
+    if (value == null) return null;
+    if (value is double) return value;
+    if (value is num) return value.toDouble();
     return double.tryParse(value.toString());
   }
 
+  static int? _asInt(dynamic value) {
+    if (value == null) return null;
+    if (value is int) return value;
+    if (value is num) return value.toInt();
+    return int.tryParse(value.toString());
+  }
+
   static DateTime? _asDateTime(dynamic value) {
-    if (value == null) {
-      return null;
-    }
-    if (value is DateTime) {
-      return value;
-    }
+    if (value == null) return null;
+    if (value is DateTime) return value;
     return DateTime.tryParse(value.toString());
   }
 }
@@ -149,23 +143,22 @@ class ProdTagAdapter extends TypeAdapter<ProdTag> {
     for (int i = 0; i < numOfFields; i++) {
       fields[reader.readByte()] = reader.read();
     }
-
     return ProdTag(
       id: fields[0] as String?,
       tagNo: fields[1] as String?,
       prodOrderId: fields[2] as String?,
       grossWeight: fields[3] as double?,
       netWeight: fields[4] as double?,
-      printUser: fields[5] as String?,
-      productCategory: fields[6] as String?,
-      qty: fields[7] as double?,
-      prodNo: fields[8] as String?,
-      createTime: fields[9] as DateTime?,
-      spec: fields[10] as String?,
-      customerCode: fields[11] as String?,
-      inventoryCode: fields[12] as String?,
-      locId: fields[13] as String?,
-      locCode: fields[14] as String?,
+      productCategory: fields[5] as String?,
+      qty: fields[6] as int?,
+      prodNo: fields[7] as String?,
+      createTime: fields[8] as DateTime?,
+      spec: fields[9] as String?,
+      customerCode: fields[10] as String?,
+      inventoryCode: fields[11] as String?,
+      inventoryName: fields[12] as String?,
+      username: fields[13] as String?,
+      userId: fields[14] as String?,
     );
   }
 
@@ -184,24 +177,24 @@ class ProdTagAdapter extends TypeAdapter<ProdTag> {
       ..writeByte(4)
       ..write(obj.netWeight)
       ..writeByte(5)
-      ..write(obj.printUser)
-      ..writeByte(6)
       ..write(obj.productCategory)
-      ..writeByte(7)
+      ..writeByte(6)
       ..write(obj.qty)
-      ..writeByte(8)
+      ..writeByte(7)
       ..write(obj.prodNo)
-      ..writeByte(9)
+      ..writeByte(8)
       ..write(obj.createTime)
-      ..writeByte(10)
+      ..writeByte(9)
       ..write(obj.spec)
-      ..writeByte(11)
+      ..writeByte(10)
       ..write(obj.customerCode)
-      ..writeByte(12)
+      ..writeByte(11)
       ..write(obj.inventoryCode)
-        ..writeByte(13)
-      ..write(obj.locId)
+      ..writeByte(12)
+      ..write(obj.inventoryName)
+      ..writeByte(13)
+      ..write(obj.username)
       ..writeByte(14)
-      ..write(obj.locCode);
+      ..write(obj.userId);
   }
 }

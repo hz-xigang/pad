@@ -35,17 +35,23 @@ class ProdTagApi {
     return ProdTag.listFromDynamic(res);
   }
 
-  static Future<ProdTag> findByTagNo(String tagNo,int type,
-      void Function(ApiException exception)? onError) async
-  {
+  static Future<ProdTag> findByTagNo(String tagNo, int type,
+      void Function(ApiException exception)? onError) async {
     final dynamic res = await ApiClient.instance.get(
       '$_basePath/tag/$tagNo?type=$type',
-      options: Options(
-        contentType: Headers.jsonContentType,
-      ),
-      onError: onError
+      options: Options(contentType: Headers.jsonContentType),
+      onError: onError,
     );
-
     return ProdTag.fromJson(res);
+  }
+
+  static Future<List<ProdTag>> listByDate(
+      String startDate, String endDate) async {
+    final dynamic res = await ApiClient.instance.get(
+      '$_basePath/list',
+      queryParameters: {'startDate': startDate, 'endDate': endDate},
+      options: Options(contentType: Headers.jsonContentType),
+    );
+    return ProdTag.listFromDynamic(res);
   }
 }
