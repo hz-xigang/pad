@@ -137,6 +137,20 @@ class TagListState extends ChangeNotifier {
     ];
   }
 
+  List<ProdTag> tableData = [];
+  void initTableData() async{
+    var req = {
+      "startDate" : _startDate,
+      "endDate" : _endDate,
+      "prodNo" : _prodNo,
+      "customerCode" : customerCode,
+      "inventoryName" : inventoryName
+    };
+
+    print(req);
+  }
+
+
   void handleReprint(ProdTag tag) {
     // TODO: 调用补打接口
     FeedbackUtil.showError('补打功能待实现');

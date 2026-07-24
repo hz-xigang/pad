@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../home/components/custom_app_bar.dart';
-import 'components/tag_filter_section.dart';
+import 'layouts/tag_filter_section.dart';
 import 'layouts/tag_list_table.dart';
 import 'state/tag_list_state.dart';
 
