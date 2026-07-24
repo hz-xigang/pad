@@ -23,10 +23,10 @@ class ProdTagApi {
     );
   }
 
-  static Future<List<ProdTag>> list(String po) async {
+  static Future<List<ProdTag>> list(dynamic data) async {
     final dynamic res = await ApiClient.instance.post(
       '$_basePath/list',
-      queryParameters: {'po': po},
+      data: data,
       options: Options(
         contentType: Headers.jsonContentType,
       ),

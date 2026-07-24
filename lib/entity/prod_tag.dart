@@ -134,6 +134,11 @@ class ProdTag {
     if (value is DateTime) return value;
     return DateTime.tryParse(value.toString());
   }
+
+  @override
+  String toString() {
+    return 'ProdTag{id: $id, tagNo: $tagNo, prodOrderId: $prodOrderId, grossWeight: $grossWeight, netWeight: $netWeight, productCategory: $productCategory, qty: $qty, prodNo: $prodNo, createTime: $createTime, spec: $spec, customerCode: $customerCode, inventoryCode: $inventoryCode, inventoryName: $inventoryName, username: $username, userId: $userId, deleted: $deleted}';
+  }
 }
 
 class ProdTagAdapter extends TypeAdapter<ProdTag> {
