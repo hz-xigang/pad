@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- TSC 标签打印机 -->
+    <usb-device vendor-id="5031" />
+
+    <!-- Zebra 打印机（可选，如需支持可取消注释） -->
+    <!-- <usb-device vendor-id="2655" /> -->
+</resources>

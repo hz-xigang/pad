@@ -19,6 +19,13 @@ dependencies:
   hive: ^2.2.3
   hive_flutter: ^1.1.0
 
+  # 打印相关依赖
+  printing: ^5.13.4          # PDF 光栅化
+  image: ^4.1.7              # 图像处理/二值化
+  quick_usb: ^0.3.1          # USB 通信
+  gbk_codec: ^0.4.0          # GBK 编码（TSPL 指令）
+  pdf: ^3.11.1               # PDF 生成
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
