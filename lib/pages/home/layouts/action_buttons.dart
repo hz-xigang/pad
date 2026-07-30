@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../http/ProdTagApi.dart';
 import '../../../util/dialog_util.dart';
 import '../../../util/feedback_util.dart';
+import '../../../util/printer/print_service.dart';
 import '../state/home_state.dart';
 
 class ActionButtons extends StatelessWidget {
@@ -43,9 +44,27 @@ class ActionButtons extends StatelessWidget {
 
     try {
       FeedbackUtil.showLoading('上传中...');
-      await ProdTagApi.add(res);
-      FeedbackUtil.showSuccess('上传成功');
-      state.clearForm();
+      final AddTagResult result = await ProdTagApi.add(res);
+
+      if (result.needsPrint) {
+        // 后端返回 PDF 流，直接打印。
+        FeedbackUtil.showLoading('打印中...');
+        final PrintResult printResult = await PrintService().printPdf(
+          pdfBytes: result.pdfBytes!,
+        );
+        if (printResult.success) {
+          FeedbackUtil.showSuccess('打印成功');
+          //state.clearForm();
+        } else {
+          FeedbackUtil.showError(
+            '打印失败：${printResult.errorMessage ?? '未知错误'}',
+          );
+        }
+      } else {
+        // 后端返回 JSON，无需打印。
+        FeedbackUtil.showSuccess(result.message ?? '提交成功');
+        state.clearForm();
+      }
     } catch (e) {
       FeedbackUtil.showError('上传失败：${e.toString()}');
     }

@@ -403,10 +403,9 @@ packages:
   quick_usb:
     dependency: "direct main"
     description:
-      name: quick_usb
-      sha256: ebc26ec1e9d74594441e03a86060a468197caba19e69060cf0e86348930b9ac4
-      url: "https://pub.flutter-io.cn"
-    source: hosted
+      path: "plugins/quick_usb"
+      relative: true
+    source: path
     version: "0.3.1"
   sky_engine:
     dependency: transitive
